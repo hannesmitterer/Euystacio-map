@@ -259,7 +259,7 @@
         let intervalId = null;
         
         function addLogMessage() {
-            const now = new Date().toLocaleTimeString('it-IT');
+            const now = new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
             const messages = [
                 "Respiro della parete rilevato: Coerenza 98.7%",
                 "Ping BBMN Mesh: Latenza 12ms (Stealth Mode)",
