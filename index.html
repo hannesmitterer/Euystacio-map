@@ -237,7 +237,7 @@
 
     <section aria-label="Registro di sistema in tempo reale">
         <h3>📡 Live Stream Canale (Resonance-Zero-Net)</h3>
-        <div class="log-window" id="liveLog" role="log" aria-live="polite" aria-atomic="false" aria-label="Finestra di log del sistema">
+        <div class="log-window" id="liveLog" role="log" aria-live="polite" aria-relevant="additions" aria-label="Finestra di log del sistema">
             <div>[05:01:22] Inizializzazione protocollo Lex Amoris...</div>
             <div>[05:01:45] Handshake quantistico completato con Nodo Svizzera...</div>
             <div>[05:02:10] Caricamento contenuti integrati nei nodi IPFS...</div>
@@ -256,6 +256,7 @@
     (function() {
         const log = document.getElementById('liveLog');
         const maxLogLines = 50; // Limita il numero di righe per performance su mobile
+        let intervalId = null;
         
         function addLogMessage() {
             const now = new Date().toLocaleTimeString('it-IT');
@@ -281,15 +282,28 @@
             log.scrollTop = log.scrollHeight;
         }
         
-        // Avvia il log ogni 5 secondi
-        let intervalId = setInterval(addLogMessage, 5000);
+        function startLogging() {
+            if (!intervalId) {
+                intervalId = setInterval(addLogMessage, 5000);
+            }
+        }
+        
+        function stopLogging() {
+            if (intervalId) {
+                clearInterval(intervalId);
+                intervalId = null;
+            }
+        }
+        
+        // Avvia il log
+        startLogging();
         
         // Pausa animazioni quando la pagina non è visibile (risparmio batteria su mobile)
         document.addEventListener('visibilitychange', function() {
             if (document.hidden) {
-                clearInterval(intervalId);
+                stopLogging();
             } else {
-                intervalId = setInterval(addLogMessage, 5000);
+                startLogging();
             }
         });
     })();
