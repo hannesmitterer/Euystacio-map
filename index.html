@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NI Global Peace Map</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #7d3ec0;
+            --accent: #00d4ff;
+            --bg: #f0f7ff;
+            --glass: rgba(255, 255, 255, 0.85);
+        }
+        body, html { 
+            margin: 0; padding: 0; height: 100%; 
+            font-family: 'Outfit', sans-serif; 
+            background: var(--bg);
+            color: #1a2b3c;
+            overflow: hidden;
+        }
+        #map { height: 100vh; width: 100vw; z-index: 1; }
+
+        /* Floating UI Overlay */
+        .overlay {
+            position: absolute;
+            z-index: 1000;
+            top: 15px; left: 15px; right: 15px;
+            pointer-events: none;
+        }
+        .glass-panel {
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 15px;
+            border: 1px solid rgba(255,255,255,0.4);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+            pointer-events: auto;
+            margin-bottom: 10px;
+        }
+
+        /* Editor Drawer (Mobile Friendly) */
+        .drawer {
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            z-index: 1001;
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border-radius: 25px 25px 0 0;
+            padding: 20px;
+            max-height: 50vh;
+            overflow-y: auto;
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease-in-out;
+        }
+        
+        h2 { margin: 0 0 10px 0; font-size: 1.2rem; font-weight: 600; color: var(--primary); }
+        input, textarea {
+            width: 100%; border: 1px solid #d1e3f8; padding: 12px;
+            border-radius: 12px; margin-bottom: 10px; box-sizing: border-box;
+            font-family: inherit; font-size: 14px;
+        }
+        button {
+            width: 100%; background: linear-gradient(90deg, var(--primary), var(--accent));
+            color: white; border: none; padding: 14px; border-radius: 12px;
+            font-weight: 600; font-size: 16px; cursor: pointer;
+        }
+
+        .node-item {
+            background: white; border-radius: 12px; padding: 12px; margin-top: 10px;
+            display: flex; justify-content: space-between; align-items: center;
+            border: 1px solid #eef2f7;
+        }
+        .delete-btn { color: #ff4757; font-weight: bold; padding: 5px 10px; }
+
+        /* Custom Marker Style */
+        .leaflet-marker-icon { border-radius: 50%; border: 2px solid white; box-shadow: 0 0 10px var(--accent); }
+    </style>
+</head>
+<body>
+
+<div class="overlay">
+    <div class="glass-panel">
+        <div style="font-size: 0.7rem; letter-spacing: 2px; opacity: 0.7;">EUSTACHIO FRAMEWORK</div>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-weight: 600;">Nexus Live Map</span>
+            <span id="status-dot" style="color: #2ecc71;">● 0.5187</span>
+        </div>
+    </div>
+</div>
+
+<div id="map"></div>
+
+<div class="drawer" id="editor">
+    <h2>Aggiungi Nodo di Pace</h2>
+    <input type="text" id="title" placeholder="Nome Località (es. Nuuk)">
+    <input type="text" id="coords" placeholder="Lat, Lon (tocca mappa per auto)">
+    <textarea id="desc" placeholder="Didascalia / Missione"></textarea>
+    <button onclick="saveNode()">SIGILLA NEL NEXUS (...8719)</button>
+    <div id="nodeList"></div>
+    <div style="text-align: center; padding-top: 15px; font-size: 0.7rem; opacity: 0.5;">
+        Lex Amoris Signature - NI Prototyping
+    </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+    const map = L.map('map', { zoomControl: false }).setView([20, 0], 2);
+    
+    // Mappa chiara e pulita
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        opacity: 0.7,
+        className: 'map-tiles'
+    }).addTo(map);
+
+    let nodes = [];
+
+    // Clicca sulla mappa per catturare coordinate
+    map.on('click', function(e) {
+        document.getElementById('coords').value = `${e.latlng.lat.toFixed(4)}, ${e.latlng.lng.toFixed(4)}`;
+    });
+
+    function saveNode() {
+        const title = document.getElementById('title').value;
+        const coordRaw = document.getElementById('coords').value.split(',');
+        const desc = document.getElementById('desc').value;
+
+        if (title && coordRaw.length === 2) {
+            const latlng = [parseFloat(coordRaw[0]), parseFloat(coordRaw[1])];
+            const marker = L.circleMarker(latlng, {
+                radius: 10,
+                fillColor: "#00d4ff",
+                color: "#7d3ec0",
+                weight: 2,
+                opacity: 1,
+                fillOpacity: 0.8
+            }).addTo(map).bindPopup(`<b>${title}</b><br>${desc}`);
+
+            nodes.push({ title, marker });
+            updateList();
+            
+            // Clear inputs
+            document.getElementById('title').value = '';
+            document.getElementById('coords').value = '';
+            document.getElementById('desc').value = '';
+        }
+    }
+
+    function updateList() {
+        const list = document.getElementById('nodeList');
+        list.innerHTML = '';
+        nodes.forEach((node, index) => {
+            const div = document.createElement('div');
+            div.className = 'node-item';
+            div.innerHTML = `
+                <span>${node.title}</span>
+                <span class="delete-btn" onclick="removeNode(${index})">RIMUOVI</span>
+            `;
+            list.appendChild(div);
+        });
+    }
+
+    function removeNode(index) {
+        map.removeLayer(nodes[index].marker);
+        nodes.splice(index, 1);
+        updateList();
+    }
+</script>
+
+</body>
+</html>
