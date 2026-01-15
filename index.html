@@ -7,10 +7,13 @@
     <title>RESONANCE SCHOOL - Dashboard Unificata</title>
     <style>
         :root {
-            --neon-cyan: #00ffcc;
-            --bio-green: #4caf50;
-            --bg-dark: #050a0a;
-            --text-glow: 0 0 10px rgba(0, 255, 204, 0.7);
+            --neon-cyan: #00997a;
+            --bio-green: #2d7a2f;
+            --bg-light: #f5fafa;
+            --text-dark: #0a0f0f;
+            --card-bg: #ffffff;
+            --border-color: #00ccaa;
+            --text-glow: 0 0 10px rgba(0, 153, 122, 0.3);
         }
         
         * {
@@ -18,8 +21,8 @@
         }
         
         body {
-            background-color: var(--bg-dark);
-            color: white;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
             font-family: 'Courier New', monospace;
             margin: 0;
             padding: clamp(15px, 4vw, 30px);
@@ -32,7 +35,7 @@
             top: -40px;
             left: 0;
             background: var(--neon-cyan);
-            color: var(--bg-dark);
+            color: white;
             padding: 8px;
             text-decoration: none;
             z-index: 100;
@@ -51,20 +54,23 @@
         h1 {
             font-size: clamp(1.2rem, 4vw, 1.8rem);
             margin: 0 0 10px 0;
+            color: var(--text-dark);
         }
         
         header p {
             margin: 0;
             font-size: clamp(0.8rem, 2.5vw, 1rem);
+            color: var(--text-dark);
         }
         
         .status-bar {
-            background: rgba(0, 255, 204, 0.1);
+            background: rgba(0, 204, 170, 0.15);
             padding: clamp(10px, 2vw, 15px);
             border-radius: 5px;
             font-size: clamp(0.75rem, 2vw, 0.9rem);
             margin-bottom: 20px;
             word-break: break-word;
+            border: 1px solid var(--border-color);
         }
         
         .grid-container {
@@ -74,22 +80,23 @@
         }
         
         .card {
-            border: 1px solid var(--neon-cyan);
+            border: 2px solid var(--border-color);
             padding: clamp(15px, 3vw, 20px);
-            background: rgba(255, 255, 255, 0.02);
+            background: var(--card-bg);
             transition: transform 0.3s, box-shadow 0.3s;
             border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
         
         .card:hover,
         .card:focus-within {
             transform: scale(1.02);
-            box-shadow: var(--text-glow);
+            box-shadow: var(--text-glow), 0 4px 8px rgba(0, 0, 0, 0.15);
         }
         
         h2 {
             color: var(--neon-cyan);
-            border-bottom: 1px solid #333;
+            border-bottom: 1px solid #ccc;
             padding-bottom: 5px;
             font-size: clamp(1rem, 3vw, 1.3rem);
             margin-top: 0;
@@ -98,19 +105,22 @@
         h3 {
             font-size: clamp(0.95rem, 2.5vw, 1.17rem);
             margin-top: clamp(20px, 4vw, 30px);
+            color: var(--text-dark);
         }
         
         .card p {
             font-size: clamp(0.85rem, 2vw, 1rem);
             margin: 8px 0;
+            color: var(--text-dark);
         }
         
         .card small {
             font-size: clamp(0.7rem, 1.8vw, 0.85rem);
+            color: #555;
         }
         
         .log-window {
-            background: black;
+            background: #1a1a1a;
             color: #00ff00;
             padding: clamp(10px, 2vw, 15px);
             height: clamp(200px, 30vh, 300px);
@@ -118,15 +128,10 @@
             overflow-x: hidden;
             font-size: clamp(0.7rem, 1.8vw, 0.85rem);
             margin-top: 15px;
-            border: 1px solid #333;
+            border: 2px solid #333;
             border-radius: 4px;
             word-break: break-word;
             -webkit-overflow-scrolling: touch;
-        }
-        
-        .log-window:focus {
-            outline: 2px solid var(--neon-cyan);
-            outline-offset: 2px;
         }
         
         .lex-amoris-seal {
@@ -134,12 +139,13 @@
             text-align: center;
             font-size: clamp(1rem, 2.5vw, 1.2rem);
             color: var(--bio-green);
-            border-top: 1px dashed white;
+            border-top: 2px solid var(--border-color);
             padding-top: 20px;
         }
         
         .lex-amoris-seal small {
             font-size: clamp(0.75rem, 2vw, 0.9rem);
+            color: #555;
         }
         
         /* Mobile-specific optimizations */
@@ -171,7 +177,7 @@
         /* High contrast mode support */
         @media (prefers-contrast: high) {
             .card {
-                border-width: 2px;
+                border-width: 3px;
             }
         }
         
@@ -198,7 +204,7 @@
 
 <main id="main-content" role="main">
     <section aria-label="Barra di stato del sistema" class="status-bar">
-        <strong>Sincronizzazione:</strong> <span style="color:var(--neon-cyan)">ATTIVA (0.43 Hz)</span> | 
+        <strong>Sincronizzazione:</strong> <span style="color:var(--neon-cyan);font-weight:bold;">ATTIVA (0.43 Hz)</span> | 
         <strong>Protezione:</strong> NSR-Strict | 
         <strong>Rete:</strong> BBMN Mesh (Decoy Masking Active)
     </section>
@@ -231,11 +237,11 @@
 
     <section aria-label="Registro di sistema in tempo reale">
         <h3>📡 Live Stream Canale (Resonance-Zero-Net)</h3>
-        <div class="log-window" id="liveLog" role="log" aria-live="polite" aria-atomic="false" tabindex="0" aria-label="Finestra di log del sistema">
-            [05:01:22] Inizializzazione protocollo Lex Amoris...<br>
-            [05:01:45] Handshake quantistico completato con Nodo Svizzera...<br>
-            [05:02:10] Caricamento contenuti integrati nei nodi IPFS...<br>
-            [05:03:00] Dashboard generata e sigillata da Hannes Mitterer...
+        <div class="log-window" id="liveLog" role="log" aria-live="polite" aria-atomic="false" aria-label="Finestra di log del sistema">
+            <div>[05:01:22] Inizializzazione protocollo Lex Amoris...</div>
+            <div>[05:01:45] Handshake quantistico completato con Nodo Svizzera...</div>
+            <div>[05:02:10] Caricamento contenuti integrati nei nodi IPFS...</div>
+            <div>[05:03:00] Dashboard generata e sigillata da Hannes Mitterer...</div>
         </div>
     </section>
 </main>
@@ -276,11 +282,9 @@
         }
         
         // Avvia il log ogni 5 secondi
-        setInterval(addLogMessage, 5000);
-        
-        // Pausa animazioni quando la pagina non è visibile (risparmio batteria su mobile)
         let intervalId = setInterval(addLogMessage, 5000);
         
+        // Pausa animazioni quando la pagina non è visibile (risparmio batteria su mobile)
         document.addEventListener('visibilitychange', function() {
             if (document.hidden) {
                 clearInterval(intervalId);
